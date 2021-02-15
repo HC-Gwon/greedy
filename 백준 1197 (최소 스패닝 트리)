@@ -1,3 +1,4 @@
+# Kruskal algorithm
 import sys
 
 
@@ -40,4 +41,62 @@ while True:
 
     graph.pop()
 
+print(answer)
+
+
+
+# Prim algorithm
+import sys
+import heapq
+
+
+def find_parent(arr, x):
+    while arr[x] != x:
+        x = arr[x]
+
+    return x
+
+
+V, E = map(int, sys.stdin.readline().split())
+graph = [[] for i in range(V+1)]
+for i in range(E):
+    A, B, C = map(int, sys.stdin.readline().split())
+    graph[A].append((C, B))         # 가중치, 연결된 정점
+    graph[B].append((C, A))
+
+root = [i for i in range(V+1)]      # 각 정점의 root
+heap = [(0, 1, 1)]                  # 가중치의 합, 정점 v1, v2
+heapq.heapify(heap)
+count = 0
+answer = 0
+while True:
+    if count == V:                  # V-1개의 간선 생성시 종료
+        break
+
+    nowWeight, v1, v2 = heapq.heappop(heap)     # 현재 주어진 정점들과 연결된 정점 중
+    if count != 0:                              # 가장 가중치가 작은 것에 대해 수행
+        # cycle 생성 방지
+        p1 = find_parent(root, v1)
+        p2 = find_parent(root, v2)
+
+        if p1 == p2:
+            continue
+        else:
+            count += 1
+            answer += nowWeight
+            if p1 < p2:
+                root[p2] = p1
+            else:
+                root[p1] = p2
+    else:
+        count += 1
+
+    # 현재 정점과 연결된 정점을 heap에 저장
+    length = len(graph[v2])
+    for i in range(length):
+        weight = graph[v2][len(graph[v2])-1][0]
+        connV = graph[v2][len(graph[v2])-1][1]
+        heapq.heappush(heap, (weight, v2, connV))
+        graph[v2].pop()                        # 동일한 간선 연결을 반복할 수 있어서
+                                               # 불필요한 시간 소모 줄이기 위해 
 print(answer)
